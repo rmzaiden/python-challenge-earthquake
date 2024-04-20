@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: acelen-dataops-library
+  description: "Repositório responsável por códigos comuns do time de dados."
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    dev.azure.com/project-repo: "acelen-dataops/acelen-dataops-library"
+    sonarqube.org/project-key: "acelendevops_acelen-dataops-library"
+spec:
+  type: service
+  owner: group:default/dataops
+  lifecycle: development
+  system: system:dataops/dataops

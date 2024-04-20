@@ -1,0 +1,8 @@
+site_name: acelen-dataops-library
+site_description: Repositório responsável por códigos comuns do time de dados.
+
+nav:
+  - Introduction: index.md
+
+plugins:
+  - techdocs-core

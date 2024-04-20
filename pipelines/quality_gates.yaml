@@ -1,0 +1,54 @@
+parameters:
+  - name: workingDirectory
+    type: string
+    default: $(System.DefaultWorkingDirectory)
+  - name: sonarCloudServiceConnection
+    type: string
+    default: 'acelensonarcloud'
+
+stages:
+  - stage: "ci"
+    jobs:
+      - job: "quality_gates"
+        steps:
+        - checkout: self
+          persistCredentials: true
+          clean: true
+        - task: SonarCloudPrepare@1
+          displayName: 'Code Analysis - Prepare'
+          inputs:
+            SonarCloud: '${{ parameters.sonarCloudServiceConnection }}'
+            organization: 'acelen'
+            scannerMode: 'CLI'
+            configMode: 'manual'
+            cliProjectKey: 'acelendevops_$(Build.Repository.Name)'
+            cliProjectName: '$(Build.Repository.Name)'
+            extraProperties: |
+              sonar.qualitygate.wait=true
+              sonar.projectBaseDir=${{ parameters.workingDirectory }}
+              sonar.coverage.exclusions=/tests/**/*
+              sonar.exclusions=catalog-info.yaml
+              sonar.python.coverage.reportPaths=coverage.xml
+        - task: Bash@3
+          displayName: setup
+          inputs:
+            targetType: 'inline'
+            script: make setup
+            workingDirectory: ${{ parameters.workingDirectory }}
+        - task: Bash@3
+          displayName: test
+          inputs:
+            targetType: 'inline'
+            script: make test
+            workingDirectory: ${{ parameters.workingDirectory }}
+        - task: PublishCodeCoverageResults@1
+          displayName: publish code coverage
+          inputs:
+            codeCoverageTool: 'Cobertura'
+            summaryFileLocation: '${{ parameters.workingDirectory }}/coverage.xml'
+        - task: SonarCloudAnalyze@1
+          displayName: 'Code Analysis - End'
+        - task: SonarCloudPublish@1
+          displayName: 'Code Analysis - Publish'
+          inputs:
+            pollingTimeoutSec: '300'

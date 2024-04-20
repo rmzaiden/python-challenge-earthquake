@@ -1,0 +1,18 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - src
+
+pool: 
+  name: Azure Pipelines 
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - template: ./quality_gates.yaml
+    parameters:
+      sonarCloudServiceConnection: 'acelensonarcloud-${{values.azureDevOpsProject}}'

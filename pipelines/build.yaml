@@ -1,0 +1,23 @@
+parameters:
+  - name: workingDirectory
+    type: string
+    default: $(System.DefaultWorkingDirectory)
+  - name: tag
+    type: string
+    default: $(Build.BuildId)
+
+stages:
+  - stage: build
+    jobs:
+      - job: "build"
+        steps:
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: "acr task build"
+            inputs:
+              azureSubscription: "acelen-devops-service-${{values.azureDevOpsProject}}"
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: ${{ parameters.workingDirectory }}
+              inlineScript: |
+                az acr build --platform linux --registry az1pacrdevops01 -t "${{values.name}}:${{ parameters.tag }}" -t "${{values.name}}:latest" .
