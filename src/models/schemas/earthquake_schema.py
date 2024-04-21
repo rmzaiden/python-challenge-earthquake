@@ -29,6 +29,7 @@ class EarthquakeModel(BaseModel):
         description="End date for the earthquake query in YYYY-MM-DD format",
     )
 
+
 class EarthquakeResponse(BaseModel):
     """
     Represents the response object for an earthquake.
@@ -36,4 +37,5 @@ class EarthquakeResponse(BaseModel):
     Attributes:
         message (str): The message associated with the earthquake response.
     """
+
     message: str

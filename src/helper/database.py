@@ -1,10 +1,12 @@
 import json
 import os
 from contextlib import contextmanager
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 _session_factory = None
+
 
 def get_session_factory(database_url: str):
     """
@@ -22,6 +24,7 @@ def get_session_factory(database_url: str):
         engine = get_connection(database_url)
         _session_factory = sessionmaker(bind=engine)
     return _session_factory
+
 
 @contextmanager
 def session_scope(database_url="DATABASE_URL"):
@@ -49,6 +52,7 @@ def session_scope(database_url="DATABASE_URL"):
     finally:
         session.close()
 
+
 def get_connection(database_url):
     """
     Establishes a connection to the database using the provided database URL.
@@ -64,9 +68,13 @@ def get_connection(database_url):
     """
     connection_string = os.getenv(database_url)
     if not connection_string:
-        raise RuntimeError(f"Database connection string '{database_url}' not found in environment.")
+        raise RuntimeError(
+            f"Database connection string '{database_url}' not found in environment."
+        )
 
     echo_sql = os.getenv("ECHO_SQL", "false").lower() == "true"
     execution_options = json.loads(os.getenv("SQLALCHEMY_EXECUTION_OPTIONS", "{}"))
 
-    return create_engine(connection_string, echo=echo_sql, execution_options=execution_options)
+    return create_engine(
+        connection_string, echo=echo_sql, execution_options=execution_options
+    )
