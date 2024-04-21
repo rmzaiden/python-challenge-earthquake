@@ -1,20 +1,28 @@
-from dotenv import load_dotenv
-load_dotenv() 
-from ..helper.database import get_connection
 import os
+import sys
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+from dotenv import load_dotenv
+from sqlalchemy.sql import text
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.dirname(current_dir)
+sys.path.append(src_dir)
+
+load_dotenv()
+
+from helper.database import get_connection
+
 
 def create_database():
     """
     Creates a new database with the given name.
     """
     db_name = "db_counterpart_challenge"
-    engine = get_connection(DATABASE_URL)
+    engine = get_connection("DATABASE_URL")
     with engine.connect() as conn:
         conn.execution_options(isolation_level="AUTOCOMMIT")
-        conn.execute(f"CREATE DATABASE {db_name}")
-        print(f"Banco de dados '{db_name}' criado com sucesso.")
+        conn.execute(text(f"CREATE DATABASE {db_name}"))
+
 
 if __name__ == "__main__":
     create_database()
