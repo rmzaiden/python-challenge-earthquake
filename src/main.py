@@ -1,17 +1,6 @@
-"""This is the main module of the project."""
+from fastapi import FastAPI
+from controllers.earthquake_controller import router as earthquake_router
 
-from utils import Logger
+app = FastAPI()
 
-logger = Logger(name="main")
-
-
-def hello():
-    """Prints "Hello World!" to stdout
-
-    :return: None
-    """
-    logger.info("Hello World!")
-
-
-if __name__ == "__main__":  # pragma: no cover
-    hello()
+app.include_router(earthquake_router)
