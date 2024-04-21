@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
+from models.response_models import EarthquakeResponse
 
 class EarthquakeService:
     """
@@ -123,5 +124,5 @@ class EarthquakeService:
             time_ms = closest_earthquake["properties"]["time"]
             earthquake_date = self.convert_timestamp_to_readable_date(time_ms)
             nearest_city = self.reverse_geocode(eq_coordinates[1], eq_coordinates[0])
-            return f"The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"
-        return "No results found."
+            return {"message": f"The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"}
+        return {"message": "No results found."}

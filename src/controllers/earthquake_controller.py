@@ -1,28 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException
-from models.earthquake_model import EarthquakeModel
 from services.earthquake_service import EarthquakeService
+from models.earthquake_model import EarthquakeModel
+from models.response_models import EarthquakeResponse
 
 router = APIRouter()
 
-@router.get("/earthquake/", response_model=str)
-async def get_closest_earthquake(query: EarthquakeModel, service: EarthquakeService = Depends()):
+@router.get("/earthquake/", response_model=EarthquakeResponse)
+def get_closest_earthquake(query: EarthquakeModel, service: EarthquakeService = Depends()):
     """
-    Retrieves the closest earthquake based on the given query parameters.
+    Get the closest earthquake based on the given query parameters.
 
     Args:
-        query (EarthquakeModel): The query parameters for retrieving the closest earthquake.
-        service (EarthquakeService, optional): The EarthquakeService instance used for processing the earthquake data. Defaults to Depends().
+        query (EarthquakeModel): The query parameters for the earthquake.
+        service (EarthquakeService, optional): The EarthquakeService instance to use. Defaults to Depends().
 
     Returns:
-        The closest earthquake based on the given query parameters.
+        EarthquakeResponse: The response containing the closest earthquake information.
 
     Raises:
-        HTTPException: If a known error occurs, an HTTPException with the appropriate status code and error message is raised.
+        HTTPException: If an error occurs while processing the earthquake data.
     """
     try:
         result = service.process_earthquake_data(query)
-        return result
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e)) from e
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from exc
+        return EarthquakeResponse(message=result['message'])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
