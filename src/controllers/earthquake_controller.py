@@ -35,5 +35,7 @@ def get_closest_earthquake(
         )
         result = service.process_earthquake_data(query)
         return EarthquakeResponse(message=result["message"])
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e

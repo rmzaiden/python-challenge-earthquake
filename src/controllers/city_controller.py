@@ -10,9 +10,22 @@ city_router = APIRouter()
     "/v1/cities/", response_model=CityResponse, status_code=status.HTTP_201_CREATED
 )
 def add_city(city_create: CityCreate):
+    """
+    Adds a new city to the system.
+
+    Args:
+        city_create (CityCreate): The data required to create a new city.
+
+    Returns:
+        City: The newly created city.
+
+    Raises:
+        HTTPException: If an error occurs while creating the city.
+    """
     try:
-        # Chama a função de serviço que cria uma nova cidade
         city = create_city(city_create)
         return city
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
