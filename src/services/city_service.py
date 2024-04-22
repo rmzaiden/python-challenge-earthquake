@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -40,11 +41,32 @@ def create_city(city_create: CityCreate) -> City:
             return city
         except IntegrityError as exc:
             db.rollback()
+            error_message = parse_integrity_error_message(str(exc))
             raise ValueError(
-                f"Cannot create city. There might be an issue with the provided foreign keys. Error: {exc}"
+                f"Cannot create city. There might be an issue with the provided foreign keys: {error_message}"
             ) from exc
         except SQLAlchemyError as exc:
             db.rollback()
             raise ValueError(
-                f"An unexpected error occurred while processing your request. Error: {exc}"
+                "An unexpected error occurred while processing your request."
             ) from exc
+
+
+def parse_integrity_error_message(error_message):
+    """
+    Parses the integrity error message and returns a user-friendly error message.
+
+    Args:
+        error_message (str): The integrity error message to parse.
+
+    Returns:
+        str: A user-friendly error message indicating the invalid reference or foreign key values.
+
+    """
+    pattern = r'constraint "FK__.*?"\.\s*The conflict occurred in database ".*?", table "dbo\.(.*?)", column \'(.*?)\''
+    match = re.search(pattern, error_message, re.IGNORECASE | re.DOTALL)
+
+    if match:
+        table, column = match.groups()
+        return f"Invalid reference in table '{table}' for column '{column}'. Please ensure the reference is correct."
+    return "Invalid foreign key reference. Please check your foreign key values."
