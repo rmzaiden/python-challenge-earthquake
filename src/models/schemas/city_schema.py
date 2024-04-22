@@ -3,13 +3,15 @@ from pydantic import BaseModel
 
 class CityCreate(BaseModel):
     name: str
-    population: int
+    state_province_id: int
+    country_id: int
+    latitude: float = None
+    longitude: float = None
 
 
 class CityResponse(BaseModel):
     id: int
     name: str
-    population: int
 
     class Config:
         orm_mode = True

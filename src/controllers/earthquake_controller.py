@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from models.schemas.earthquake_schema import EarthquakeModel, EarthquakeResponse
+from models.schemas.earthquake_schema import (EarthquakeModel,
+                                              EarthquakeResponse)
 from services.earthquake_service import EarthquakeService
 
-router = APIRouter()
+earthquake_router = APIRouter()
 
 
-@router.get("/earthquake/", response_model=EarthquakeResponse)
+@earthquake_router.get("/v1/earthquakes/", response_model=EarthquakeResponse)
 def get_closest_earthquake(
     city_name: str = Query(...),
     start_date: str = Query(...),

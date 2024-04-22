@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 
 from helper.database import Base
 
@@ -10,11 +10,17 @@ class City(Base):
     Attributes:
         id (int): The unique identifier for the city.
         name (str): The name of the city.
-        population (int): The population of the city.
     """
 
     __tablename__ = "cities"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    population = Column(Integer)
+    name = Column(String, unique=True)
+    state_province_id = Column(
+        Integer, ForeignKey("states.id")
+    )  # Relacionamento com o modelo State
+    country_id = Column(
+        Integer, ForeignKey("countries.id")
+    )  # Relacionamento com o modelo Country
+    latitude = Column(Float)
+    longitude = Column(Float)
