@@ -51,6 +51,23 @@ def create_city(city_create: CityCreate) -> City:
                 "An unexpected error occurred while processing your request."
             ) from exc
 
+def get_cities():
+    """
+    Retrieve all cities from the database.
+
+    Returns:
+        List[Country]: A list of City objects representing the cities in the database.
+
+    Raises:
+        ValueError: If an unexpected database error occurs.
+    """
+    with session_scope() as db:
+        try:
+            return db.query(City).all()
+        except SQLAlchemyError as exc:
+            raise ValueError(
+                f"An unexpected error occurred while fetching cities. Error: {exc}"
+            )
 
 def parse_integrity_error_message(error_message):
     """

@@ -18,9 +18,9 @@ class City(Base):
     name = Column(String, unique=True)
     state_province_id = Column(
         Integer, ForeignKey("states.id")
-    )  # Relacionamento com o modelo State
+    )
     country_id = Column(
         Integer, ForeignKey("countries.id")
-    )  # Relacionamento com o modelo Country
+    )
     latitude = Column(Float)
     longitude = Column(Float)
