@@ -34,10 +34,13 @@ def add_country(country_create: CountryCreate):
 @country_router.get("/countries/", response_model=List[CountryResponse])
 def list_countries():
     """
-    Retrieves a list of countries.
+    Retrieve a list of countries.
 
     Returns:
-        list: A list of countries.
+        List[str]: A list of country names.
+
+    Raises:
+        HTTPException: If there is a client-side error (status code 400) or an unexpected error occurs (status code 500).
     """
     try:
         countries = get_countries()

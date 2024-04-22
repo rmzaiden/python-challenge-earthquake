@@ -11,7 +11,7 @@ city_router = APIRouter()
 )
 def add_city(city_create: CityCreate):
     """
-    Adds a new city to the system.
+    Add a new city to the system.
 
     Args:
         city_create (CityCreate): The data required to create a new city.
@@ -20,7 +20,7 @@ def add_city(city_create: CityCreate):
         City: The newly created city.
 
     Raises:
-        HTTPException: If an error occurs while creating the city.
+        HTTPException: If there is a validation error or an unexpected error occurs.
     """
     try:
         city = create_city(city_create)

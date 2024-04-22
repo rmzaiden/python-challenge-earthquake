@@ -33,10 +33,13 @@ def add_state(state_create: StateCreate):
 @state_router.get("/states/", response_model=List[StateResponse])
 def list_states():
     """
-    Retrieves a list of states.
+    Retrieve a list of states.
 
     Returns:
-        list: A list of states.
+        List[str]: A list of state names.
+
+    Raises:
+        HTTPException: If there is a validation error (status code 400) or an unexpected error occurs (status code 500).
     """
     try:
         states = get_states()
