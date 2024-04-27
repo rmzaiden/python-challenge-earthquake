@@ -1,20 +1,26 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 
 from models.schemas.country_schema import CountryCreate, CountryResponse
-from services.country_service import create_country, get_countries
+from services.country_service import CountryService
 
 country_router = APIRouter()
 
+def get_country_service():
+    """
+    Dependency injector function that creates an instance of the CountryService class.
+    """
+    return CountryService()
 
-@country_router.post("/v1/countries/", response_model=CountryResponse)
-def add_country(country_create: CountryCreate):
+@country_router.post("/v1/countries/", response_model=CountryResponse, status_code=status.HTTP_201_CREATED)
+def add_country(country_create: CountryCreate, country_service: CountryService = Depends(get_country_service)):
     """
     Adds a new country to the system.
 
     Args:
         country_create (CountryCreate): The data required to create a new country.
+        country_service (CountryService): The service instance to handle country creation.
 
     Returns:
         Country: The newly created country.
@@ -23,29 +29,32 @@ def add_country(country_create: CountryCreate):
         HTTPException: If an error occurs while creating the country.
     """
     try:
-        country = create_country(country_create)
+        country = country_service.create_country(country_create)
         return country
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
-
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
 
 @country_router.get("/v1/countries/", response_model=List[CountryResponse])
-def list_countries():
+def list_countries(country_service: CountryService = Depends(get_country_service)):
     """
     Retrieve a list of countries.
 
     Returns:
-        List[str]: A list of country names.
+        List[CountryResponse]: A list of countries.
 
     Raises:
         HTTPException: If there is a client-side error (status code 400) or an unexpected error occurs (status code 500).
     """
     try:
-        countries = get_countries()
+        countries = country_service.get_countries()
         return countries
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e

@@ -17,15 +17,15 @@ def get_closest_earthquake(
     Get the closest earthquake to a given city within a specified date range.
 
     Args:
-        city_id (int): The database ID of the city.
-        start_date (str): The start date for the earthquake query.
-        end_date (str): The end date for the earthquake query.
+        city_id (int): The ID of the city.
+        start_date (str): The start date of the date range.
+        end_date (str): The end date of the date range.
         city_service (CityService): The service for retrieving city information.
         earthquake_service (EarthquakeService): The service for processing earthquake data.
 
     Returns:
-        EarthquakeResponse: The response containing the result message.
-    
+        EarthquakeResponse: The response containing the closest earthquake information.
+
     Raises:
         HTTPException: If the city is not found or if there is an internal server error.
     """
@@ -33,11 +33,14 @@ def get_closest_earthquake(
         city = city_service.get_city_by_id(city_id)
         if not city:
             raise HTTPException(status_code=404, detail="City not found")
-        
-        # Cria o objeto EarthquakeModel esperado pelo serviço
-        query = EarthquakeModel(city_name=city.name, start_date=start_date, end_date=end_date)
+
+        state_abbreviation = city.state.state_abbreviation if city.state else ""
+        query = EarthquakeModel(city_name=city.name, state_abbreviation=state_abbreviation, start_date=start_date, end_date=end_date)
+
         
         result = earthquake_service.process_earthquake_data(query)
         return EarthquakeResponse(message=result["message"])
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) from e

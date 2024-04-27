@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from helper.database import Base
 
@@ -16,6 +17,5 @@ class City(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True)
-    state_province_id = Column(
-        Integer, ForeignKey("states.id")
-    )
+    state_province_id = Column(Integer, ForeignKey("states.id"))
+    state = relationship("State", back_populates="cities")

@@ -8,7 +8,20 @@ from geopy.geocoders import Nominatim
 
 class EarthquakeService:
     """
-    A class that provides methods to fetch earthquake data, process earthquake data, and perform geolocation operations.
+    A class that provides methods to fetch earthquake data, process the data, and retrieve a message about the search.
+
+    Attributes:
+        geolocator (Nominatim): A geolocator object used for geocoding and reverse geocoding.
+        api_url (str): The URL of the earthquake data API.
+
+    Methods:
+        fetch_earthquake_data: Fetches earthquake data from the API.
+        get_city_coordinates: Retrieves the coordinates (latitude and longitude) of a city.
+        reverse_geocode: Performs reverse geocoding to get the address of a location.
+        convert_date: Converts a date string to a readable format.
+        convert_timestamp_to_readable_date: Converts a timestamp to a readable date format.
+        process_earthquake_data: Processes earthquake data and returns the closest earthquake to a city.
+
     """
 
     def __init__(self):
@@ -17,7 +30,7 @@ class EarthquakeService:
 
     def fetch_earthquake_data(self, starttime, endtime):
         """
-        Fetches earthquake data from the USGS Earthquake Catalog API.
+        Fetches earthquake data from the API.
 
         Args:
             starttime (str): The start time of the earthquake data query.
@@ -28,6 +41,7 @@ class EarthquakeService:
 
         Raises:
             HTTPException: If the API request fails.
+
         """
         params = {
             "format": "geojson",
@@ -47,52 +61,62 @@ class EarthquakeService:
 
     def get_city_coordinates(self, city_name):
         """
-        Retrieves the latitude and longitude coordinates of a given city.
+        Retrieves the coordinates (latitude and longitude) of a city.
 
         Args:
             city_name (str): The name of the city.
 
         Returns:
-            tuple: A tuple containing the latitude and longitude coordinates of the city.
+            tuple: The latitude and longitude of the city.
 
         Raises:
             ValueError: If the city is not found.
+
         """
         location = self.geolocator.geocode(city_name)
         if location:
             return (location.latitude, location.longitude)
         else:
-            raise ValueError("City not found")
+            raise ValueError(f"Coordinates not found for {city_name} city.")
 
     def reverse_geocode(self, latitude, longitude):
         """
-        Performs reverse geocoding to retrieve the address of a given latitude and longitude.
+        Performs reverse geocoding to get the address of a location.
 
         Args:
-            latitude (float): The latitude coordinate.
-            longitude (float): The longitude coordinate.
+            latitude (float): The latitude of the location.
+            longitude (float): The longitude of the location.
 
         Returns:
-            str: The address corresponding to the given coordinates.
+            str: The address of the location.
 
-        Returns:
-            str: "Unknown location" if the location is not found.
         """
         location = self.geolocator.reverse((latitude, longitude), exactly_one=True)
-        if location:
-            return location.address
-        else:
-            return "Unknown location"
+        return location.address if location else "Unknown location"
+
+    def convert_date(self, date_str):
+        """
+        Converts a date string to a readable format.
+
+        Args:
+            date_str (str): The date string in the format "YYYY-MM-DD".
+
+        Returns:
+            str: The date string in the format "Month DD, YYYY".
+
+        """
+        return datetime.strptime(date_str, "%Y-%m-%d").strftime("%B %d, %Y")
 
     def convert_timestamp_to_readable_date(self, timestamp_ms):
         """
-        Converts a timestamp in milliseconds to a readable date format.
+        Converts a timestamp to a readable date format.
 
         Args:
             timestamp_ms (int): The timestamp in milliseconds.
 
         Returns:
-            str: The readable date format.
+            str: The readable date string in the format "Month DD".
+
         """
         return datetime.fromtimestamp(timestamp_ms / 1000.0, tz=timezone.utc).strftime(
             "%B %d"
@@ -100,16 +124,14 @@ class EarthquakeService:
 
     def process_earthquake_data(self, query):
         """
-        Processes earthquake data to find the closest earthquake to a given city.
+        Processes earthquake data and returns the closest earthquake to a city.
 
         Args:
             query (Query): An object containing the city name, start date, and end date.
 
         Returns:
-            str: A string describing the closest earthquake to the given city.
+            dict: A dictionary containing the result message.
 
-        Returns:
-            str: "No results found." if no earthquake data is available.
         """
         city_coordinates = self.get_city_coordinates(query.city_name)
         earthquake_data = self.fetch_earthquake_data(query.start_date, query.end_date)
@@ -122,13 +144,20 @@ class EarthquakeService:
             if distance < min_distance:
                 min_distance = distance
                 closest_earthquake = earthquake
+        start_date = self.convert_date(query.start_date)
+        end_date = self.convert_date(query.end_date)
         if closest_earthquake:
             mag = closest_earthquake["properties"]["mag"]
             eq_coordinates = closest_earthquake["geometry"]["coordinates"]
             time_ms = closest_earthquake["properties"]["time"]
             earthquake_date = self.convert_timestamp_to_readable_date(time_ms)
             nearest_city = self.reverse_geocode(eq_coordinates[1], eq_coordinates[0])
+            state_abbreviation = (
+                f"{query.state_abbreviation}" if query.state_abbreviation else ""
+            )
             return {
-                "message": f"The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"
+                "message": f"Result for {query.city_name},{state_abbreviation} between {start_date} and {end_date}: The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"
             }
-        return {"message": "No results found."}
+        return {
+            "message": f"No results found for {query.city_name} between {start_date} and {end_date}."
+        }

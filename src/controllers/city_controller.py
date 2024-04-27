@@ -1,10 +1,12 @@
 from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from models.schemas.city_schema import CityCreate, CityResponse
 from services.city_service import CityService
 
 city_router = APIRouter()
+
 
 def get_city_service():
     """
@@ -14,8 +16,13 @@ def get_city_service():
     """
     return CityService()
 
-@city_router.post("/v1/cities/", response_model=CityResponse, status_code=status.HTTP_201_CREATED)
-def add_city(city_create: CityCreate, city_service: CityService = Depends(get_city_service)):
+
+@city_router.post(
+    "/v1/cities/", response_model=CityResponse, status_code=status.HTTP_201_CREATED
+)
+def add_city(
+    city_create: CityCreate, city_service: CityService = Depends(get_city_service)
+):
     """
     Add a new city to the system.
 
@@ -36,6 +43,7 @@ def add_city(city_create: CityCreate, city_service: CityService = Depends(get_ci
     except Exception as e:
         raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
 
+
 @city_router.get("/v1/cities/", response_model=List[CityResponse])
 def list_cities(city_service: CityService = Depends(get_city_service)):
     """
@@ -53,4 +61,6 @@ def list_cities(city_service: CityService = Depends(get_city_service)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e

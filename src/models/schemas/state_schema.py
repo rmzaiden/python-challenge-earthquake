@@ -11,6 +11,7 @@ class StateResponse(BaseModel):
     id: int
     name: str
     state_abbreviation: str
+    country_id: int
 
     class Config:
         orm_mode = True

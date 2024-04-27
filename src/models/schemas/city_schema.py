@@ -9,8 +9,10 @@ class CityCreate(BaseModel):
         name (str): The name of the city.
         state_province_id (int): The ID of the state or province the city belongs to.
     """
+
     name: str
     state_province_id: int
+
 
 class CityResponse(BaseModel):
     """
@@ -23,12 +25,4 @@ class CityResponse(BaseModel):
 
     id: int
     name: str
-
-    class Config:
-        """
-        Configuration class for the CitySchema.
-
-        Attributes:
-            orm_mode (bool): Flag indicating whether the schema is used for ORM mode.
-        """
-        orm_mode = True
+    state_province_id: int
