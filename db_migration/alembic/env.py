@@ -5,14 +5,14 @@ sys.path.append("../src")
 
 from logging.config import fileConfig
 
-from alembic import context
 from dotenv import load_dotenv
-from sqlalchemy import engine_from_config, pool
-
 from helper.database import Base
 from models.db.city_model import City
 from models.db.country_model import Country
 from models.db.state_model import State
+from sqlalchemy import engine_from_config, pool
+
+from alembic import context
 
 load_dotenv()  # Load .env file
 

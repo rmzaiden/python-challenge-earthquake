@@ -30,7 +30,7 @@ def add_state(state_create: StateCreate):
         raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
 
 
-@state_router.get("/states/", response_model=List[StateResponse])
+@state_router.get("/v1/states/", response_model=List[StateResponse])
 def list_states():
     """
     Retrieve a list of states.

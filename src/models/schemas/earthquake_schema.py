@@ -1,29 +1,26 @@
-from datetime import date
-
 from pydantic import BaseModel, Field
 
 
 class EarthquakeModel(BaseModel):
     """
-    Represents a model for querying earthquake data.
+    Represents the schema for an earthquake query.
 
     Attributes:
         city_name (str): Name of the city to check for earthquakes.
-        start_date (date): Start date for the earthquake query in YYYY-MM-DD format.
-        end_date (date): End date for the earthquake query in YYYY-MM-DD format.
+        start_date (str): Start date for the earthquake query in YYYY-MM-DD format.
+        end_date (str): End date for the earthquake query in YYYY-MM-DD format.
     """
-
     city_name: str = Field(
         ...,
-        example="Los Angeles, CA",
+        example="Los Angeles",
         description="Name of the city to check for earthquakes",
     )
-    start_date: date = Field(
+    start_date: str = Field(
         ...,
         example="2021-06-01",
         description="Start date for the earthquake query in YYYY-MM-DD format",
     )
-    end_date: date = Field(
+    end_date: str = Field(
         ...,
         example="2021-07-05",
         description="End date for the earthquake query in YYYY-MM-DD format",

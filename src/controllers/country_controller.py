@@ -31,7 +31,7 @@ def add_country(country_create: CountryCreate):
         raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
 
 
-@country_router.get("/countries/", response_model=List[CountryResponse])
+@country_router.get("/v1/countries/", response_model=List[CountryResponse])
 def list_countries():
     """
     Retrieve a list of countries.

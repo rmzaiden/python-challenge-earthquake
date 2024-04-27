@@ -10,6 +10,7 @@ class StateCreate(BaseModel):
 class StateResponse(BaseModel):
     id: int
     name: str
+    state_abbreviation: str
 
     class Config:
         orm_mode = True

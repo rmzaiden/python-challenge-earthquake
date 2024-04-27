@@ -1,41 +1,43 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-
-from models.schemas.earthquake_schema import (EarthquakeModel,
-                                              EarthquakeResponse)
+from fastapi import APIRouter, Depends, HTTPException, Query, Path
 from services.earthquake_service import EarthquakeService
+from services.city_service import CityService
+from models.schemas.earthquake_schema import EarthquakeModel, EarthquakeResponse
 
 earthquake_router = APIRouter()
 
-
-@earthquake_router.get("/v1/earthquakes/", response_model=EarthquakeResponse)
+@earthquake_router.get("/v1/earthquakes/{city_id}", response_model=EarthquakeResponse)
 def get_closest_earthquake(
-    city_name: str = Query(...),
-    start_date: str = Query(...),
-    end_date: str = Query(...),
-    service: EarthquakeService = Depends(),
+    city_id: int = Path(..., description="The ID of the city"),
+    start_date: str = Query(..., description="The start date of the date range"),
+    end_date: str = Query(..., description="The end date of the date range"),
+    city_service: CityService = Depends(),
+    earthquake_service: EarthquakeService = Depends(),
 ):
     """
-    Retrieves the closest earthquake data for a given city within a specified date range.
+    Get the closest earthquake to a given city within a specified date range.
 
     Args:
-        city_name (str): The name of the city.
-        start_date (str): The start date of the date range.
-        end_date (str): The end date of the date range.
-        service (EarthquakeService): An instance of the EarthquakeService class.
+        city_id (int): The database ID of the city.
+        start_date (str): The start date for the earthquake query.
+        end_date (str): The end date for the earthquake query.
+        city_service (CityService): The service for retrieving city information.
+        earthquake_service (EarthquakeService): The service for processing earthquake data.
 
     Returns:
-        EarthquakeResponse: The response object containing the result message.
-
+        EarthquakeResponse: The response containing the result message.
+    
     Raises:
-        HTTPException: If an error occurs during the processing of earthquake data.
+        HTTPException: If the city is not found or if there is an internal server error.
     """
     try:
-        query = EarthquakeModel(
-            city_name=city_name, start_date=start_date, end_date=end_date
-        )
-        result = service.process_earthquake_data(query)
+        city = city_service.get_city_by_id(city_id)
+        if not city:
+            raise HTTPException(status_code=404, detail="City not found")
+        
+        # Cria o objeto EarthquakeModel esperado pelo serviço
+        query = EarthquakeModel(city_name=city.name, start_date=start_date, end_date=end_date)
+        
+        result = earthquake_service.process_earthquake_data(query)
         return EarthquakeResponse(message=result["message"])
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
+        raise HTTPException(status_code=500, detail=str(e)) from e
