@@ -75,46 +75,16 @@ def test_add_city_success(mock_create_city):
     mock_create_city.return_value = {
         "id": 1,
         "name": "Los Angeles",
-        "state_province_id": 1,
-        "country_id": 1,
-        "latitude": 40.7128,
-        "longitude": -74.0060,
+        "state_province_id": 1
     }
 
     city_data = {
         "name": "Los Angeles",
-        "state_province_id": 1,
-        "country_id": 1,
-        "latitude": 40.7128,
-        "longitude": -74.0060,
+        "state_province_id": 1
     }
     response = client.post("/v1/cities/", json=city_data)
     assert response.status_code == 201
     assert response.json() == {"id": 1, "name": "Los Angeles"}
-
-
-@patch("controllers.city_controller.create_city")
-def test_add_city_success(mock_create_city):
-    mock_create_city.return_value = {
-        "id": 1,
-        "name": "Los Angeles",
-        "state_province_id": 1,
-        "country_id": 1,
-        "latitude": 40.7128,
-        "longitude": -74.0060,
-    }
-
-    city_data = {
-        "name": "Los Angeles",
-        "state_province_id": 1,
-        "country_id": 1,
-        "latitude": 40.7128,
-        "longitude": -74.0060,
-    }
-    response = client.post("/v1/cities/", json=city_data)
-    assert response.status_code == 201
-    assert response.json() == {"id": 1, "name": "Los Angeles"}
-
 
 @patch("controllers.city_controller.create_city")
 def test_add_city_with_invalid_state_province(mock_create_city):
@@ -124,9 +94,6 @@ def test_add_city_with_invalid_state_province(mock_create_city):
     city_data = {
         "name": "Los Angeles",
         "state_province_id": "a",
-        "country_id": 1,
-        "latitude": 40.7128,
-        "longitude": -74.0060,
     }
     response = client.post("/v1/cities/", json=city_data)
     print(response.json())
@@ -144,43 +111,13 @@ def test_add_city_with_invalid_state_province(mock_create_city):
 
 
 @patch("controllers.city_controller.create_city")
-def test_add_city_with_invalid_state_country(mock_create_city):
-
-    mock_create_city.return_value = ""
-
-    city_data = {
-        "name": "Los Angeles",
-        "state_province_id": 0,
-        "country_id": "a",
-        "latitude": 40.7128,
-        "longitude": -74.0060,
-    }
-    response = client.post("/v1/cities/", json=city_data)
-    print(response.json())
-    assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "type": "int_parsing",
-                "loc": ["body", "country_id"],
-                "msg": "Input should be a valid integer, unable to parse string as an integer",
-                "input": "a",
-            }
-        ]
-    }
-
-
-@patch("controllers.city_controller.create_city")
 def test_add_city_with_invalid_city_name(mock_create_city):
 
     mock_create_city.return_value = ""
 
     city_data = {
         "name": 1,
-        "state_province_id": 0,
-        "country_id": 1,
-        "latitude": 40.7128,
-        "longitude": -74.0060,
+        "state_province_id": 0
     }
     response = client.post("/v1/cities/", json=city_data)
     print(response.json())

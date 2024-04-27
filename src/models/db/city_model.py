@@ -19,8 +19,3 @@ class City(Base):
     state_province_id = Column(
         Integer, ForeignKey("states.id")
     )
-    country_id = Column(
-        Integer, ForeignKey("countries.id")
-    )
-    latitude = Column(Float)
-    longitude = Column(Float)
