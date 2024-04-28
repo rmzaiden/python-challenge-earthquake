@@ -15,9 +15,21 @@ class CityCreate(BaseModel):
 
     @field_validator('name')
     def validate_name(cls, value):
-        if not value.strip():
-            raise ValueError('The city name must not be empty or just spaces.')
-        return value
+            """
+            Validates the city name.
+
+            Args:
+                value (str): The city name to be validated.
+
+            Raises:
+                ValueError: If the city name is empty or contains only spaces.
+
+            Returns:
+                str: The validated city name.
+            """
+            if not value.strip():
+                raise ValueError('The city name must not be empty or just spaces.')
+            return value
 
 
 class CityResponse(BaseModel):
