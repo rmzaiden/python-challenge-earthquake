@@ -14,7 +14,7 @@ def get_closest_earthquake(
     end_date: str = Query(..., description="The end date of the date range"),
     city_service: CityService = Depends(),
     earthquake_service: EarthquakeService = Depends(),
-):
+)-> EarthquakeResponse:
     """
     Get the closest earthquake to a given city within a specified date range.
 
@@ -38,6 +38,7 @@ def get_closest_earthquake(
 
         state_abbreviation = city.state.state_abbreviation if city.state else ""
         query = EarthquakeModel(
+            city_id=city_id,
             city_name=city.name,
             state_abbreviation=state_abbreviation,
             start_date=start_date,

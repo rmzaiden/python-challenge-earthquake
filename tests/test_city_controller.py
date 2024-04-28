@@ -75,7 +75,7 @@ def test_add_city_unexpected_error():
 
         # Assert
         assert response.status_code == 500
-        assert response.json() == {"detail": "An unexpected error occurred"}
+        assert response.json() == {'detail': 'An unexpected error occurred.'}
         mock_create_city.assert_called_once_with(CityCreate(**city_data))
 
 

@@ -4,6 +4,8 @@ import requests
 from fastapi import HTTPException
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+from helper.database import session_scope
+from models.db.earthquake_search_model import EarthquakeSearch
 from utils.logger import Logger
 
 logger = Logger(name="earthquake_service")
@@ -31,7 +33,7 @@ class EarthquakeService:
         self.geolocator = Nominatim(user_agent="my_unique_geocoder")
         self.api_url = "https://earthquake.usgs.gov/fdsnws/event/1/query"
 
-    def fetch_earthquake_data(self, starttime, endtime):
+    def fetch_earthquake_data(self, starttime, endtime)-> dict:
         """
         Fetches earthquake data from the API.
 
@@ -66,7 +68,7 @@ class EarthquakeService:
                 detail="Failed to retrieve earthquake data.",
             )
 
-    def get_city_coordinates(self, city_name):
+    def get_city_coordinates(self, city_name)-> tuple:
         """
         Retrieves the coordinates (latitude and longitude) of a city.
 
@@ -104,7 +106,7 @@ class EarthquakeService:
         location = self.geolocator.reverse((latitude, longitude), exactly_one=True)
         return location.address if location else "Unknown location"
 
-    def convert_date(self, date_str):
+    def convert_date(self, date_str)-> str:
         """
         Converts a date string to a readable format.
 
@@ -117,7 +119,7 @@ class EarthquakeService:
         """
         return datetime.strptime(date_str, "%Y-%m-%d").strftime("%B %d, %Y")
 
-    def convert_timestamp_to_readable_date(self, timestamp_ms):
+    def convert_timestamp_to_readable_date(self, timestamp_ms)-> str:
         """
         Converts a timestamp to a readable date format.
 
@@ -132,7 +134,7 @@ class EarthquakeService:
             "%B %d"
         )
 
-    def process_earthquake_data(self, query):
+    def process_earthquake_data(self, query)-> dict:
         """
         Processes earthquake data and returns the closest earthquake to a city.
 
@@ -172,6 +174,26 @@ class EarthquakeService:
                 result_message = {
                     "message": f"Result for {query.city_name},{state_abbreviation} between {start_date} and {end_date}: The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"
                 }
+
+                logger.info("Starting save search in database")
+                try:
+                    with session_scope() as db:
+                        # Create earthquake search entry
+                        earthquake_search = EarthquakeSearch(
+                        city_id=query.city_id,
+                        start_date=datetime.strptime(query.start_date, "%Y-%m-%d"),
+                        end_date=datetime.strptime(query.end_date, "%Y-%m-%d"),
+                        closest_earthquake_date=datetime.fromtimestamp(time_ms / 1000.0, tz=timezone.utc),
+                        closest_earthquake_magnitude=mag,
+                        closest_earthquake_distance=min_distance,
+                        closest_earthquake_location=nearest_city
+                        )
+                        db.add(earthquake_search)
+                        db.commit()
+                    logger.info("Search saved successfully.")
+                except Exception as exc:
+                    logger.error(f"Error saving search: {exc}")
+                    
             else:
                 result_message = {
                     "message": "No results found"

@@ -13,6 +13,7 @@ from helper.database import Base
 from models.db.city_model import City
 from models.db.country_model import Country
 from models.db.state_model import State
+from models.db.earthquake_search_model import EarthquakeSearch
 
 load_dotenv()  # Load .env file
 

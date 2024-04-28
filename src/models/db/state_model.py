@@ -1,6 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
-
 from helper.database import Base
 
 

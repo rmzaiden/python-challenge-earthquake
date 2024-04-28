@@ -19,3 +19,4 @@ class City(Base):
     name = Column(String, unique=True)
     state_province_id = Column(Integer, ForeignKey("states.id"))
     state = relationship("State", back_populates="cities")
+    earthquake_searches = relationship("EarthquakeSearch", back_populates="city")

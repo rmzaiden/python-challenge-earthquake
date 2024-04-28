@@ -21,7 +21,8 @@ def test_get_closest_earthquake_success(mock_process_earthquake, mock_get_city_b
     mock_state.state_abbreviation = "CA"
 
     mock_city = MagicMock()
-    mock_city.name = "Los Angeles"
+    mock_city.id = 1
+    mock_city.name = 'Los Angeles'
     mock_city.state = mock_state
     mock_get_city_by_id.return_value = mock_city
 
@@ -30,6 +31,7 @@ def test_get_closest_earthquake_success(mock_process_earthquake, mock_get_city_b
 
     # Act
     response = client.get("/v1/earthquakes/1?start_date=2021-01-01&end_date=2021-07-02")
+    print(response.text)
 
     # Assert
     assert response.status_code == 200
@@ -39,6 +41,7 @@ def test_get_closest_earthquake_success(mock_process_earthquake, mock_get_city_b
 
     mock_process_earthquake.assert_called_once_with(
         EarthquakeModel(
+            city_id=1,
             city_name="Los Angeles",
             state_abbreviation="CA",
             start_date="2021-01-01",

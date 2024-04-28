@@ -7,6 +7,11 @@ class EarthquakeModel(BaseModel):
         example="Los Angeles",
         description="Name of the city to check for earthquakes",
     )
+    city_id: int = Field(
+        ...,
+        example=1,
+        description="ID of the city to check for earthquakes",
+    )
     state_abbreviation: str = Field(
         ...,
         example="CA",
