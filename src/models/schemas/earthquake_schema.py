@@ -2,6 +2,16 @@ from pydantic import BaseModel, Field
 
 
 class EarthquakeModel(BaseModel):
+    """
+    Represents the schema for earthquake data.
+
+    Attributes:
+        city_name (str): Name of the city to check for earthquakes.
+        city_id (int): ID of the city to check for earthquakes.
+        state_abbreviation (str): State abbreviation of the city to check for earthquakes.
+        start_date (str): Start date for the earthquake query in YYYY-MM-DD format.
+        end_date (str): End date for the earthquake query in YYYY-MM-DD format.
+    """
     city_name: str = Field(
         ...,
         example="Los Angeles",
