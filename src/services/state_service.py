@@ -29,7 +29,7 @@ class StateService:
         with session_scope() as db:
             try:
                 state = State(
-                    name=state_create.name, country_id=state_create.country_id
+                    name=state_create.name, state_abbreviation=state_create.state_abbreviation, country_id=state_create.country_id
                 )
                 db.add(state)
                 db.commit()
