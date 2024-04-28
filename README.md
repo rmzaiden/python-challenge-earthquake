@@ -68,6 +68,9 @@ coverage html
 ```
 ---
 
+# Sequence Diagram
+![Texto alternativo](diagram.png)
+
 # Docker Images
 
 - [Azure Function](https://hub.docker.com/_/microsoft-azure-functions-python) (based)
@@ -75,3 +78,6 @@ coverage html
 - [Azurite](https://hub.docker.com/_/microsoft-azure-storage-azurite)
 - [Grafana](https://hub.docker.com/r/grafana/grafana)
 - [Loki](https://hub.docker.com/r/grafana/loki)
+
+
+

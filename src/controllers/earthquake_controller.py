@@ -7,7 +7,7 @@ from services.earthquake_service import EarthquakeService
 earthquake_router = APIRouter()
 
 
-@earthquake_router.get("/v1/earthquakes/{city_id}", response_model=EarthquakeResponse)
+@earthquake_router.post("/v1/earthquakes/{city_id}", response_model=EarthquakeResponse)
 def get_closest_earthquake(
     city_id: int = Path(..., description="The ID of the city"),
     start_date: str = Query(..., description="The start date of the date range"),

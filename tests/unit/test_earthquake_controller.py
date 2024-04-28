@@ -30,7 +30,7 @@ def test_get_closest_earthquake_success(mock_process_earthquake, mock_get_city_b
     mock_process_earthquake.return_value = {"message": expected_message}
 
     # Act
-    response = client.get("/v1/earthquakes/1?start_date=2021-01-01&end_date=2021-07-02")
+    response = client.post("/v1/earthquakes/1?start_date=2021-01-01&end_date=2021-07-02")
     print(response.text)
 
     # Assert
@@ -60,7 +60,7 @@ def test_get_closest_earthquake_city_not_found(mock_get_city_by_id):
     mock_get_city_by_id.return_value = None
 
     # Act
-    response = client.get(
+    response = client.post(
         "/v1/earthquakes/999?start_date=2021-01-01&end_date=2021-01-02"
     )
 
@@ -94,7 +94,7 @@ def test_get_closest_earthquake_unexpected_error(
     mock_process_earthquake.side_effect = Exception("Unexpected error")
 
     # Act
-    response = client.get("/v1/earthquakes/1?start_date=2021-01-01&end_date=2021-01-02")
+    response = client.post("/v1/earthquakes/1?start_date=2021-01-01&end_date=2021-01-02")
 
     # Assert
     assert (
