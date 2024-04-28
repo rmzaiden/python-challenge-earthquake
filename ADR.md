@@ -6,9 +6,7 @@
 
 ## Context
 
-We selected Python for the development of HTTP microservices due to its ease of development.
-
-We considered the following frameworks for HTTP microservices development:
+I considered the following frameworks for HTTP microservices development:
 Python - FastAPI
 
 ### 1) Performance
