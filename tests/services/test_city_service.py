@@ -63,27 +63,27 @@ class TestCityService(unittest.TestCase):
         self.assertIn("Cannot create city", str(context.exception))
         mock_add.assert_called_once()
 
+    def test_get_city_by_id_success(self):
+        """
+        Scenario: Get a city by ID successfully.
+        """
+        with patch('services.city_service.CityService.get_city_by_id') as mock_get_city_by_id:
+            # Arrange
+            expected_city = MagicMock()
+            expected_city.id = 1
+            expected_city.name = "Test City"
+            mock_get_city_by_id.return_value = expected_city
+
+            # Act
+            city_service = CityService()
+            city = city_service.get_city_by_id(1)
+
+            # Assert
+            mock_get_city_by_id.assert_called_once_with(1)
+            assert city.name == "Test City", "City name should match the expected value"
+
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
-        Base.metadata.drop_all(cls.engine)
+        Base.metadata.drop_all(cls.engine)   
 
-
-def test_get_city_by_id_success():
-    """
-    Scenario: Get a city by ID successfully.
-    """
-    with patch('services.city_service.CityService.get_city_by_id') as mock_get_city_by_id:
-        # Arrange
-        expected_city = MagicMock()
-        expected_city.id = 1
-        expected_city.name = "Test City"
-        mock_get_city_by_id.return_value = expected_city
-
-        # Act
-        city_service = CityService()
-        city = city_service.get_city_by_id(1)
-
-        # Assert
-        mock_get_city_by_id.assert_called_once_with(1)
-        assert city.name == "Test City", "City name should match the expected value"     
