@@ -5,6 +5,7 @@ from sqlalchemy.orm import joinedload
 
 from helper.database import session_scope
 from models.db.city_model import City
+from models.schemas.city_schema import CityCreate
 
 
 class CityService:
@@ -12,7 +13,7 @@ class CityService:
     Service class for managing cities.
     """
 
-    def create_city(self, city_create):
+    def create_city(self, city_create: CityCreate):
         """
         Creates a new city in the database.
 

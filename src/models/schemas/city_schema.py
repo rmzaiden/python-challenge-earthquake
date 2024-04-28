@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class CityCreate(BaseModel):
@@ -10,8 +10,14 @@ class CityCreate(BaseModel):
         state_province_id (int): The ID of the state or province the city belongs to.
     """
 
-    name: str
-    state_province_id: int
+    name: str = Field(..., description="The name of the city.")
+    state_province_id: int = Field(..., description="The ID of the state or province the city belongs to.")
+
+    @field_validator('name')
+    def validate_name(cls, value):
+        if not value.strip():
+            raise ValueError('The city name must not be empty or just spaces.')
+        return value
 
 
 class CityResponse(BaseModel):
