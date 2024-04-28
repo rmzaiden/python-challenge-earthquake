@@ -1,11 +1,12 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from models.schemas.country_schema import CountryCreate, CountryResponse
 from services.country_service import CountryService
 
 country_router = APIRouter()
+
 
 def get_country_service():
     """
@@ -13,8 +14,16 @@ def get_country_service():
     """
     return CountryService()
 
-@country_router.post("/v1/countries/", response_model=CountryResponse, status_code=status.HTTP_201_CREATED)
-def add_country(country_create: CountryCreate, country_service: CountryService = Depends(get_country_service)):
+
+@country_router.post(
+    "/v1/countries/",
+    response_model=CountryResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_country(
+    country_create: CountryCreate,
+    country_service: CountryService = Depends(get_country_service),
+):
     """
     Adds a new country to the system.
 
@@ -37,6 +46,7 @@ def add_country(country_create: CountryCreate, country_service: CountryService =
         raise HTTPException(
             status_code=500, detail="An unexpected error occurred"
         ) from e
+
 
 @country_router.get("/v1/countries/", response_model=List[CountryResponse])
 def list_countries(country_service: CountryService = Depends(get_country_service)):

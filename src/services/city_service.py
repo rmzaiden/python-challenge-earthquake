@@ -1,9 +1,11 @@
+import re
+
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import joinedload
 
 from helper.database import session_scope
 from models.db.city_model import City
-import re
+
 
 class CityService:
     """
@@ -27,7 +29,7 @@ class CityService:
             try:
                 city = City(
                     name=city_create.name,
-                    state_province_id=city_create.state_province_id
+                    state_province_id=city_create.state_province_id,
                 )
                 db.add(city)
                 db.commit()
@@ -39,7 +41,9 @@ class CityService:
                 raise ValueError(f"Cannot create city: {error_message}") from exc
             except SQLAlchemyError as exc:
                 db.rollback()
-                raise ValueError("An unexpected error occurred while processing your request.") from exc
+                raise ValueError(
+                    "An unexpected error occurred while processing your request."
+                ) from exc
 
     @staticmethod
     def extract_error_message(exc_message):
@@ -53,31 +57,38 @@ class CityService:
             str: The extracted error message.
 
         """
-        unique_violation_pattern = re.compile(r"Violation of UNIQUE KEY constraint.*?The duplicate key value is \((.*?)\).", re.IGNORECASE)
-        fk_violation_pattern = re.compile(r"conflicted with the FOREIGN KEY constraint", re.IGNORECASE)
+        unique_violation_pattern = re.compile(
+            r"Violation of UNIQUE KEY constraint.*?The duplicate key value is \((.*?)\).",
+            re.IGNORECASE,
+        )
+        fk_violation_pattern = re.compile(
+            r"conflicted with the FOREIGN KEY constraint", re.IGNORECASE
+        )
 
         if unique_violation_match := unique_violation_pattern.search(exc_message):
-            return f"Duplicate entry '{unique_violation_match.group(1)}' for unique column."
+            return f"Already exists city with name: {unique_violation_match.group(1)}"
         elif fk_violation_pattern.search(exc_message):
-            return "Foreign key violation. Please check the foreign key references."
+            return "State does not exist. Please provide a valid state_province_id."
         else:
             return "Data validation error. Please check the input data."
 
     def get_cities(self):
-            """
-            Retrieves all cities from the database.
+        """
+        Retrieves all cities from the database.
 
-            Returns:
-                list: A list of City objects representing all the cities in the database.
+        Returns:
+            list: A list of City objects representing all the cities in the database.
 
-            Raises:
-                ValueError: If an unexpected error occurs while fetching cities from the database.
-            """
-            with session_scope() as db:
-                try:
-                    return db.query(City).all()
-                except SQLAlchemyError as exc:
-                    raise ValueError(f"An unexpected error occurred while fetching cities. Error: {exc}") from exc
+        Raises:
+            ValueError: If an unexpected error occurs while fetching cities from the database.
+        """
+        with session_scope() as db:
+            try:
+                return db.query(City).all()
+            except SQLAlchemyError as exc:
+                raise ValueError(
+                    f"An unexpected error occurred while fetching cities. Error: {exc}"
+                ) from exc
 
     def get_city_by_id(self, city_id):
         """
@@ -90,5 +101,10 @@ class CityService:
             City or None: The city object if found, None otherwise.
         """
         with session_scope() as db:
-            city = db.query(City).options(joinedload(City.state)).filter(City.id == city_id).first()
+            city = (
+                db.query(City)
+                .options(joinedload(City.state))
+                .filter(City.id == city_id)
+                .first()
+            )
             return city if city else None

@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, Path
-from services.earthquake_service import EarthquakeService
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
+
+from models.schemas.earthquake_schema import (EarthquakeModel,
+                                              EarthquakeResponse)
 from services.city_service import CityService
-from models.schemas.earthquake_schema import EarthquakeModel, EarthquakeResponse
+from services.earthquake_service import EarthquakeService
 
 earthquake_router = APIRouter()
+
 
 @earthquake_router.get("/v1/earthquakes/{city_id}", response_model=EarthquakeResponse)
 def get_closest_earthquake(
@@ -35,9 +38,13 @@ def get_closest_earthquake(
             raise HTTPException(status_code=404, detail="City not found")
 
         state_abbreviation = city.state.state_abbreviation if city.state else ""
-        query = EarthquakeModel(city_name=city.name, state_abbreviation=state_abbreviation, start_date=start_date, end_date=end_date)
+        query = EarthquakeModel(
+            city_name=city.name,
+            state_abbreviation=state_abbreviation,
+            start_date=start_date,
+            end_date=end_date,
+        )
 
-        
         result = earthquake_service.process_earthquake_data(query)
         return EarthquakeResponse(message=result["message"])
     except HTTPException:

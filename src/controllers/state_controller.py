@@ -1,11 +1,12 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from models.schemas.state_schema import StateCreate, StateResponse
 from services.state_service import StateService
 
 state_router = APIRouter()
+
 
 def get_state_service():
     """
@@ -13,8 +14,13 @@ def get_state_service():
     """
     return StateService()
 
-@state_router.post("/v1/states/", response_model=StateResponse, status_code=status.HTTP_201_CREATED)
-def add_state(state_create: StateCreate, state_service: StateService = Depends(get_state_service)):
+
+@state_router.post(
+    "/v1/states/", response_model=StateResponse, status_code=status.HTTP_201_CREATED
+)
+def add_state(
+    state_create: StateCreate, state_service: StateService = Depends(get_state_service)
+):
     """
     Adds a new state to the system.
 
@@ -33,7 +39,10 @@ def add_state(state_create: StateCreate, state_service: StateService = Depends(g
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
+
 
 @state_router.get("/v1/states/", response_model=List[StateResponse])
 def list_states(state_service: StateService = Depends(get_state_service)):
@@ -52,4 +61,6 @@ def list_states(state_service: StateService = Depends(get_state_service)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from e
+        raise HTTPException(
+            status_code=500, detail="An unexpected error occurred"
+        ) from e
