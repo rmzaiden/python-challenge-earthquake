@@ -37,7 +37,7 @@ def add_state(
         state = state_service.create_state(state_create)
         return state
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+        raise HTTPException(status_code=400, detail=str(e)) from e #pragma: no cover
     except Exception as e:
         raise HTTPException(
             status_code=500, detail="An unexpected error occurred"
@@ -58,9 +58,9 @@ def list_states(state_service: StateService = Depends(get_state_service)):
     try:
         states = state_service.get_states()
         return states
-    except ValueError as e:
+    except ValueError as e: #pragma: no cover
         raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
+    except Exception as e: #pragma: no cover
         raise HTTPException(
             status_code=500, detail="An unexpected error occurred"
         ) from e

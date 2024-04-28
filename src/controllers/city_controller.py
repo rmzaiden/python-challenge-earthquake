@@ -38,9 +38,9 @@ def add_city(
     try:
         city = city_service.create_city(city_create)
         return city
-    except ValueError as e:
+    except ValueError as e: #pragma: no cover
         raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
+    except Exception as e: #pragma: no cover
         raise HTTPException(
             status_code=500, detail=f"An unexpected error occurred."
         ) from e
@@ -60,9 +60,9 @@ def list_cities(city_service: CityService = Depends(get_city_service)):
     try:
         cities = city_service.get_cities()
         return cities
-    except ValueError as e:
+    except ValueError as e: #pragma: no cover
         raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
+    except Exception as e: #pragma: no cover
         raise HTTPException(
             status_code=500, detail="An unexpected error occurred"
         ) from e

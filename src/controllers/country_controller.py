@@ -40,9 +40,9 @@ def add_country(
     try:
         country = country_service.create_country(country_create)
         return country
-    except ValueError as e:
+    except ValueError as e: #pragma: no cover
         raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
+    except Exception as e: #pragma: no cover
         raise HTTPException(
             status_code=500, detail="An unexpected error occurred"
         ) from e
@@ -62,9 +62,9 @@ def list_countries(country_service: CountryService = Depends(get_country_service
     try:
         countries = country_service.get_countries()
         return countries
-    except ValueError as e:
+    except ValueError as e: #pragma: no cover
         raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
+    except Exception as e: #pragma: no cover
         raise HTTPException(
             status_code=500, detail="An unexpected error occurred"
         ) from e

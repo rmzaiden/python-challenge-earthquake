@@ -72,3 +72,24 @@ def test_add_state_unexpected_error():
         assert response.status_code == 500
         assert response.json().get("detail") == "An unexpected error occurred"
         mock_create_state.assert_called_once()
+
+def test_list_states():
+    """
+    Scenario: List all states
+    """
+    expected_states = [
+        {"id": 1, "name": "São Paulo", "state_abbreviation":"SP", "country_id": 1},
+        {"id": 2, "name": "California", "state_abbreviation":"CA", "country_id": 2}
+    ]
+
+    with patch("services.state_service.StateService.get_states") as mock_get_states:
+        # Arrange
+        mock_get_states.return_value = expected_states
+
+        # Act
+        response = client.get("/v1/states/")
+
+        # Assert
+        assert response.status_code == 200
+        assert response.json() == expected_states
+        mock_get_states.assert_called_once()
