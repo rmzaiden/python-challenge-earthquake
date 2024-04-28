@@ -51,7 +51,7 @@ class TestCityService(unittest.TestCase):
         """
         # Arrange
         city_service = CityService(session=self.session)
-        city_create = CityCreate(name="New City2", state_province_id=1)
+        city_create = CityCreate(name="New City", state_province_id=1)
         error_message = "duplicate key value violates unique constraint"
         mock_add.side_effect = IntegrityError("statement", "params", error_message)
 
