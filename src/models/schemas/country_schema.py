@@ -28,6 +28,9 @@ class CountryCreate(BaseModel):
         if not value.strip():
             raise ValueError('The country name must not be empty or just spaces.')
         return value
+    
+    class Config:
+        orm_mode = True
 
 
 class CountryResponse(BaseModel):

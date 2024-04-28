@@ -1,7 +1,6 @@
 import re
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import joinedload
 
 from helper.database import session_scope
 from models.db.state_model import State
@@ -86,6 +85,4 @@ class StateService:
             try:
                 return db.query(State).all()
             except SQLAlchemyError as exc:
-                raise ValueError(
-                    f"An unexpected error occurred while fetching states. Error: {exc}"
-                )
+                raise ValueError(f"An unexpected error occurred while fetching states. Error: {exc}") from exc

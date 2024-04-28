@@ -30,6 +30,10 @@ class CityCreate(BaseModel):
             if not value.strip():
                 raise ValueError('The city name must not be empty or just spaces.')
             return value
+    
+    
+    class Config:
+            orm_mode = True
 
 
 class CityResponse(BaseModel):

@@ -51,6 +51,10 @@ class StateCreate(BaseModel):
             if not value.strip():
                 raise ValueError('The state abbreviation must not be empty or just spaces.')
             return value
+    
+    
+    class Config:
+            orm_mode = True
 
 
 class StateResponse(BaseModel):

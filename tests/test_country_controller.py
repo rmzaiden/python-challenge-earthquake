@@ -1,33 +1,30 @@
 from fastapi.testclient import TestClient
 from unittest.mock import patch, MagicMock
 from models.schemas.country_schema import CountryCreate, CountryResponse
+from services.country_service import CountryService
 from main import app
 
 client = TestClient(app)
 
-def test_add_country_success():
+
+def test_add_country_endpoint():
     """
-    Scenario: Add a new country successfully
+    Scenario: Add a new country
     """
 
     # Arrange
-    country_data = {
-        "name": "New Country"
-    }
-    expected_response = {
-        "id": 1,
-        "name": "New Country"
-    }
+    country_data = {"name": "New Country"}
+    expected_country = {"id": 1, "name": "New Country"}
 
-    with patch("services.country_service.CountryService.create_country") as mock_create_country:
-        mock_create_country.return_value = expected_response
-
+    with patch("services.country_service.CountryService.create_country", return_value=CountryResponse(**expected_country)) as mock_create_country:
+        
         # Act
         response = client.post("/v1/countries/", json=country_data)
-
+        
         # Assert
-        assert response.status_code == 201
-        assert response.json() == expected_response
+        assert response.status_code == 201, "Status code should be 201"
+        assert response.json() == expected_country, "Response should match expected response"
+
         mock_create_country.assert_called_once_with(CountryCreate(**country_data))
 
 def test_add_country_validation_error():
