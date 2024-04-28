@@ -48,7 +48,7 @@ def test_add_state_validation_error():
     response = client.post("/v1/states/", json=state_data)
 
     # Assert
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert "detail" in response.json()
 
 def test_add_state_unexpected_error():
