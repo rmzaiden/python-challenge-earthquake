@@ -4,6 +4,9 @@ import requests
 from fastapi import HTTPException
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+from utils.logger import Logger
+
+logger = Logger(name="earthquake_service")
 
 
 class EarthquakeService:
@@ -50,10 +53,14 @@ class EarthquakeService:
             "minmagnitude": 5,
             "orderby": "magnitude",
         }
+        logger.info(f"Fetching earthquake data from {starttime} to {endtime}.")
         response = requests.get(self.api_url, params=params, timeout=10)
         if response.status_code == 200:
             return response.json()
         else:
+            logger.error(
+                f"Failed to retrieve earthquake data. Status code: {response.status_code}"
+            )
             raise HTTPException(
                 status_code=response.status_code,
                 detail="Failed to retrieve earthquake data.",
@@ -73,10 +80,12 @@ class EarthquakeService:
             ValueError: If the city is not found.
 
         """
+        logger.info(f"Getting coordinates for {city_name}.")
         location = self.geolocator.geocode(city_name)
         if location:
             return (location.latitude, location.longitude)
         else:
+            logger.error(f"Coordinates not found for {city_name} city.")
             raise ValueError(f"Coordinates not found for {city_name} city.")
 
     def reverse_geocode(self, latitude, longitude):
@@ -91,6 +100,7 @@ class EarthquakeService:
             str: The address of the location.
 
         """
+        logger.info(f"Getting reverse geocoding for coordinates: {latitude}, {longitude}.")
         location = self.geolocator.reverse((latitude, longitude), exactly_one=True)
         return location.address if location else "Unknown location"
 
@@ -133,31 +143,41 @@ class EarthquakeService:
             dict: A dictionary containing the result message.
 
         """
-        city_coordinates = self.get_city_coordinates(query.city_name)
-        earthquake_data = self.fetch_earthquake_data(query.start_date, query.end_date)
-        closest_earthquake = None
-        min_distance = float("inf")
-        for earthquake in earthquake_data.get("features", []):
-            eq_coordinates = earthquake["geometry"]["coordinates"]
-            eq_point = (eq_coordinates[1], eq_coordinates[0])
-            distance = geodesic(city_coordinates, eq_point).kilometers
-            if distance < min_distance:
-                min_distance = distance
-                closest_earthquake = earthquake
-        start_date = self.convert_date(query.start_date)
-        end_date = self.convert_date(query.end_date)
-        if closest_earthquake:
-            mag = closest_earthquake["properties"]["mag"]
-            eq_coordinates = closest_earthquake["geometry"]["coordinates"]
-            time_ms = closest_earthquake["properties"]["time"]
-            earthquake_date = self.convert_timestamp_to_readable_date(time_ms)
-            nearest_city = self.reverse_geocode(eq_coordinates[1], eq_coordinates[0])
-            state_abbreviation = (
-                f"{query.state_abbreviation}" if query.state_abbreviation else ""
-            )
-            return {
-                "message": f"Result for {query.city_name},{state_abbreviation} between {start_date} and {end_date}: The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"
-            }
-        return {
-            "message": f"No results found for {query.city_name} between {start_date} and {end_date}."
-        }
+        logger.info(
+            f"Processing earthquake data for {query.city_name} between {query.start_date} and {query.end_date}."
+        )
+        try:
+            city_coordinates = self.get_city_coordinates(query.city_name)
+            earthquake_data = self.fetch_earthquake_data(query.start_date, query.end_date)
+            closest_earthquake = None
+            min_distance = float("inf")
+            for earthquake in earthquake_data.get("features", []):
+                eq_coordinates = earthquake["geometry"]["coordinates"]
+                eq_point = (eq_coordinates[1], eq_coordinates[0])
+                distance = geodesic(city_coordinates, eq_point).kilometers
+                if distance < min_distance:
+                    min_distance = distance
+                    closest_earthquake = earthquake
+            start_date = self.convert_date(query.start_date)
+            end_date = self.convert_date(query.end_date)
+            if closest_earthquake:
+                mag = closest_earthquake["properties"]["mag"]
+                eq_coordinates = closest_earthquake["geometry"]["coordinates"]
+                time_ms = closest_earthquake["properties"]["time"]
+                earthquake_date = self.convert_timestamp_to_readable_date(time_ms)
+                nearest_city = self.reverse_geocode(eq_coordinates[1], eq_coordinates[0])
+                state_abbreviation = (
+                    f"{query.state_abbreviation}" if query.state_abbreviation else ""
+                )
+                result_message = {
+                    "message": f"Result for {query.city_name},{state_abbreviation} between {start_date} and {end_date}: The closest earthquake to {query.city_name} was an M {mag} - {nearest_city} on {earthquake_date}"
+                }
+            else:
+                result_message = {
+                    "message": "No results found"
+                }
+            logger.info("Earthquake data processed successfully.")
+            return result_message
+        except ValueError as exc:
+            logger.error(f"Error processing earthquake data: {exc}")
+            return {"message": str(exc)}

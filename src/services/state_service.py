@@ -5,6 +5,9 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from helper.database import session_scope
 from models.db.state_model import State
 from models.schemas.state_schema import StateCreate
+from utils.logger import Logger
+
+logger = Logger(name="state_service")
 
 
 class StateService:
@@ -25,6 +28,7 @@ class StateService:
         Raises:
             ValueError: If the specified country ID does not exist or an unexpected error occurs.
         """
+        logger.info(f"Starting creating state: {state_create}")
         with session_scope() as db:
             try:
                 state = State(
@@ -33,10 +37,12 @@ class StateService:
                 db.add(state)
                 db.commit()
                 db.refresh(state)
+                logger.info(f"State: {state_create.name} created successfully.")
                 return state
             except IntegrityError as exc:
                 db.rollback()
                 error_message = self.extract_error_message(str(exc))
+                logger.error(f"State: {state_create.name} creation failed. Error: {exc}")
                 raise ValueError(f"Cannot create state: {error_message}") from exc
             except SQLAlchemyError as exc:
                 db.rollback()
@@ -56,6 +62,7 @@ class StateService:
             str: The extracted error message.
 
         """
+        logger.debug(f"Extracting error message from: {exc_message}")
         unique_violation_pattern = re.compile(
             r"Violation of UNIQUE KEY constraint.*?The duplicate key value is \((.*?)\).",
             re.IGNORECASE,
@@ -81,8 +88,10 @@ class StateService:
         Raises:
             ValueError: If an unexpected database error occurs.
         """
+        logger.info("Retrieving all states.")
         with session_scope() as db:
             try:
                 return db.query(State).all()
             except SQLAlchemyError as exc:
+                logger.error(f"An unexpected error occurred while fetching states. Error: {exc}")
                 raise ValueError(f"An unexpected error occurred while fetching states. Error: {exc}") from exc

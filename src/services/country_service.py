@@ -4,7 +4,9 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from helper.database import session_scope
 from models.db.country_model import Country
+from utils.logger import Logger
 
+logger = Logger(name="country_service")
 
 class CountryService:
     """
@@ -24,16 +26,18 @@ class CountryService:
         Raises:
             ValueError: If there is an issue with the database insertion.
         """
-        
+        logger.info(f"Starting creating country: {country_create}")
         with session_scope() as db:
             try:
                 country = Country(name=country_create.name)
                 db.add(country)
                 db.commit()
                 db.refresh(country)
+                logger.info(f"Country: {country_create} created successfully.")
                 return country
             except IntegrityError as exc:
                 db.rollback()
+                logger.error(f"Country: {country_create} creation failed. Error: {exc}")
                 error_message = self.extract_error_message(str(exc))
                 raise ValueError(f"Cannot create country: {error_message}") from exc
             except SQLAlchemyError as exc:
@@ -54,6 +58,7 @@ class CountryService:
             str: The extracted error message.
 
         """
+        logger.info(f"Extracting error message from: {exc_message}")
         unique_violation_pattern = re.compile(
             r"Violation of UNIQUE KEY constraint.*?The duplicate key value is \((.*?)\).",
             re.IGNORECASE,
@@ -76,10 +81,12 @@ class CountryService:
         Raises:
             ValueError: If an unexpected database error occurs.
         """
+        logger.info("Starting fetching countries.")
         with session_scope() as db:
             try:
                 return db.query(Country).all()
             except SQLAlchemyError as exc:
+                logger.error(f"An unexpected error occurred while fetching countries. Error: {exc}")
                 raise ValueError(
                     f"An unexpected error occurred while fetching countries. Error: {exc}"
                 ) from exc
