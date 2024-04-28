@@ -40,7 +40,7 @@ class CountryService:
                 raise ValueError(
                     "An unexpected error occurred while processing your request."
                 ) from exc
-            
+
     @staticmethod
     def extract_error_message(exc_message):
         """
@@ -59,7 +59,9 @@ class CountryService:
         )
 
         if unique_violation_match := unique_violation_pattern.search(exc_message):
-            return f"Already exists country with name: {unique_violation_match.group(1)}"
+            return (
+                f"Already exists country with name: {unique_violation_match.group(1)}"
+            )
         else:
             return "Data validation error. Please check the input data."
 

@@ -44,7 +44,7 @@ class StateService:
                 raise ValueError(
                     "An unexpected error occurred while processing your request."
                 ) from exc
-            
+
     @staticmethod
     def extract_error_message(exc_message):
         """

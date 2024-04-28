@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
-from models.schemas.earthquake_schema import (EarthquakeModel,
-                                              EarthquakeResponse)
+from models.schemas.earthquake_schema import EarthquakeModel, EarthquakeResponse
 from services.city_service import CityService
 from services.earthquake_service import EarthquakeService
 
