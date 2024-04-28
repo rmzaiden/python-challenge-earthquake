@@ -42,7 +42,7 @@ def add_city(
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(
-            status_code=500, detail="An unexpected error occurred"
+            status_code=500, detail=f"An unexpected error occurred. Error: {e}"
         ) from e
 
 

@@ -13,9 +13,6 @@ class CityService:
     Service class for managing cities.
     """
 
-    def __init__(self, session=None):
-        self.db = session or session_scope()
-
     def create_city(self, city_create: CityCreate):
         """
         Creates a new city in the database.
@@ -29,24 +26,25 @@ class CityService:
         Raises:
             ValueError: If there is an issue with the provided foreign keys or an unexpected error occurs.
         """
-        try:
-            city = City(
-                name=city_create.name,
-                state_province_id=city_create.state_province_id,
-            )
-            self.db.add(city)
-            self.db.commit()
-            self.db.refresh(city)
-            return city
-        except IntegrityError as exc:
-            self.db.rollback()
-            error_message = self.extract_error_message(str(exc))
-            raise ValueError(f"Cannot create city: {error_message}") from exc
-        except SQLAlchemyError as exc:
-            self.db.rollback()
-            raise ValueError(
-                "An unexpected error occurred while processing your request."
-            ) from exc
+        with session_scope() as db:
+            try:
+                city = City(
+                    name=city_create.name,
+                    state_province_id=city_create.state_province_id,
+                )
+                db.add(city)
+                db.commit()
+                db.refresh(city)
+                return city
+            except IntegrityError as exc:
+                db.rollback()
+                error_message = self.extract_error_message(str(exc))
+                raise ValueError(f"Cannot create city: {error_message}") from exc
+            except SQLAlchemyError as exc:
+                db.rollback()
+                raise ValueError(
+                    "An unexpected error occurred while processing your request."
+                ) from exc
 
     @staticmethod
     def extract_error_message(exc_message):
@@ -85,12 +83,13 @@ class CityService:
         Raises:
             ValueError: If an unexpected error occurs while fetching cities from the database.
         """
-        try:
-            return self.db.query(City).all()
-        except SQLAlchemyError as exc:
-            raise ValueError(
-                f"An unexpected error occurred while fetching cities. Error: {exc}"
-            ) from exc
+        with session_scope() as db:
+            try:
+                return db.query(City).all()
+            except SQLAlchemyError as exc:
+                raise ValueError(
+                    f"An unexpected error occurred while fetching cities. Error: {exc}"
+                ) from exc
 
     def get_city_by_id(self, city_id):
         """
@@ -102,9 +101,11 @@ class CityService:
         Returns:
             City or None: The city object if found, None otherwise.
         """
-        try:
-            return self.db.query(City).options(joinedload(City.state)).filter(City.id == city_id).first()
-        except SQLAlchemyError as exc:
-            raise ValueError(
-                f"An unexpected error occurred while fetching the city. Error: {exc}"
-            ) from exc
+        with session_scope() as db:
+            city = (
+                db.query(City)
+                .options(joinedload(City.state))
+                .filter(City.id == city_id)
+                .first()
+            )
+            return city if city else None

@@ -24,6 +24,7 @@ class CountryService:
         Raises:
             ValueError: If there is an issue with the database insertion.
         """
+        
         with session_scope() as db:
             try:
                 country = Country(name=country_create.name)
