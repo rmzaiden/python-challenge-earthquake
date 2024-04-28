@@ -14,3 +14,9 @@ db-migrate:
 db-upgrade:
 	cd db_migration && \
 	alembic upgrade head
+
+test:
+	pytest tests/
+
+coverage:
+	pytest --cov=src --cov-report=term-missing tests/
