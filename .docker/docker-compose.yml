@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      SA_USER: "sa"
+      SA_PASSWORD: "^dZUs6^pQ$4H^i"
+      ACCEPT_EULA: Y
+    ports:
+      - "1433:1433"
+    networks:
+      - app-network
+  api:
+    container_name: "earthquake_fastapi"
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
