@@ -44,7 +44,7 @@ def add_country(
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e: #pragma: no cover
         raise HTTPException(
-            status_code=500, detail="An unexpected error occurred"
+            status_code=500, detail=f"An unexpected error occurred {e}"
         ) from e
 
 

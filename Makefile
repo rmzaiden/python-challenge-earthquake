@@ -2,6 +2,9 @@ setup:
 	@test -d .venv || python3.9 -m venv .venv
 	@. .venv/bin/activate && pip install -r requirements-dev.txt
 
+db-create:
+	@. .venv/bin/activate && python ./src/utils/create_database.py
+
 db-migrate:
 	@test -n "$(msg)" || (echo "msg is not set. Use make db-migrate MSG='Your migration message here'"; exit 1)
 	cd db_migration && \

@@ -18,10 +18,10 @@ def create_database():
     Creates a new database with the given name.
     """
     db_name = "db_counterpart_challenge"
-    engine = get_connection("DATABASE_URL")
+    engine = get_connection("DATABASE_MASTER_URL")
     with engine.connect() as conn:
         conn.execution_options(isolation_level="AUTOCOMMIT")
-        conn.execute(text(f"CREATE DATABASE {db_name}"))
+        conn.execute(text(f"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{db_name}') BEGIN CREATE DATABASE {db_name}; END;"))
 
 
 if __name__ == "__main__":
