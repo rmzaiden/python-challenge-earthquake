@@ -16,28 +16,7 @@ After installation, run the following command to create a local Docker container
 ```sh
 docker compose -f .docker/docker-compose.yml up -d --build
 ```
-
-# fastapi-mysql-docker
-
-## Elements
-
-- FastAPI
-- MySQL
-- Docker
-
 ---
-
-## Setup development environment (Docker compose)
-
-Please install [`Docker` and `Docker compose`](https://www.docker.com/) first.
-
-## Manual setup
-
-After installation, run the following command to create a local Docker container.
-
-```sh
-docker compose -f .docker/docker-compose.yml up -d --build
-```
 
 If Docker is running successfully, the API and DB server will be launched as shown in the following:
 
@@ -90,7 +69,7 @@ Before executing the query that will return the nearest earthquake with a magnit
 
 To help retrieve the IDs generated for each record in the database, I have created additional endpoints that list all the countries, states, and cities created.
 
-"The contracts for each endpoint can be easily found at the link http://localhost:8000/v1/docs"
+The contracts for each endpoint can be easily found at the link http://localhost:8000/v1/docs
 
 # Database Migrations (Alembic)
 
